@@ -231,10 +231,15 @@ server.get("/updatePickIt",function (request, response) {
 server.get("/getUserPickits",function (request,response) {
     let userId = request.query.userId;
     var arrayOfPickits = [];
-    usersPickIt[userId].forEach(v => arrayOfPickits.push(v));
-    let jsonToSend = {};
-    jsonToSend["userPickits"] = arrayOfPickits;
-    response.send(jsonToSend)
+    if(usersPickIt[userId] != null) {
+        usersPickIt[userId].forEach(v => arrayOfPickits.push(v));
+        let jsonToSend = {};
+        jsonToSend["userPickits"] = arrayOfPickits;
+        response.send(jsonToSend)
+    }
+    else {
+        response.send({error: "false"});
+    }
 });
 
 server.get("/2",function (request, response) {
