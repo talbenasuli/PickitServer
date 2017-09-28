@@ -176,7 +176,36 @@ server.get("/getPlaceName", function (request, response) {
     var placeNameJson = {};
     placeNameJson["placeName"] = placeName;
     response.send(placeNameJson);
-})
+});
+
+server.get("/sendSongSuggest",function (request, response) {
+    let songName = request.query.songName;
+    let artist = request.query.artist;
+    let youtubeLink = request.query.youtubeLink;
+
+    fs.readFile('./suggestions.txt', 'utf8', function (err, data) {
+        if (err) {
+            console.log(err);
+        }
+        let currentfileData = data;
+
+        var suggestionToWright;
+        if(currentfileData != null) {
+            suggestionToWright = currentfileData + "\r\n\r\n songName: " + songName + "\r\n artist: " + artist + "\r\n youtube link: " + youtubeLink;
+        }
+        else {
+            suggestionToWright = " songName: " + songName + "\r\n artist: " + artist + "\t\n youtube link: " + youtubeLink;
+        }
+
+        fs.writeFile("./suggestions.txt", suggestionToWright, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("The file was saved!");
+        });
+    });
+    response.send({status: true});
+});
 
 server.get("/getCurrentPlayingSong",function (request, response) {
     var messageToSend = [];
@@ -216,7 +245,7 @@ server.get("/updatePickIt",function (request, response) {
         var pickIts = parseInt(songToUpdate.pickIts);
         songToUpdate.pickIts = JSON.stringify(pickIts += 1);
         updateArray(songToUpdateIndex);
-        emitAllClients("true",1,[songToUpdate.songID]);
+        emitAllClients("true",1,[songToUpdate.songID,songToUpdate]);
         response.send({status: "true"});
         userIdPickItUntilNow.add(songID);
         usersPickIt[userId] = userIdPickItUntilNow;
